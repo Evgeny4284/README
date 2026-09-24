@@ -1,31 +1,25 @@
-import taxes.UsnIncome;
-import taxes.UsnIncomeMinusExpenses;
-import deals.Deal;
-import deals.Sale;
-import deals.Expenditure;
-
 public class Main {
     public static void main(String[] args) {
-        // Задача 1: смена системы налогообложения и уплата налогов
-        Company company = new Company("ООО «Ромашка»", new UsnIncome());
+        SimpleAccount simple = new SimpleAccount();
+        CreditAccount credit = new CreditAccount(50_000);
 
-        company.shiftMoney(100_000);
-        company.shiftMoney(-30_000);
-        company.shiftMoney(0);
-        company.payTaxes(); // 6% от 100000 = 6000 руб.
+        // Обычный счёт: пополняем и платим
+        System.out.println(simple.add(100_000)); // true
+        System.out.println(simple.pay(30_000));  // true
+        System.out.println(simple.pay(80_000));  // false, денег не хватает
+        System.out.println("Баланс обычного счёта: " + simple.getBalance()); // 70000
 
-        company.setTaxSystem(new UsnIncomeMinusExpenses());
-        company.shiftMoney(100_000);
-        company.shiftMoney(-40_000);
-        company.payTaxes(); // 15% от (100000 - 40000) = 9000 руб.
+        // Кредитный счёт: уходит в минус до лимита, в плюс уйти не может
+        System.out.println(credit.pay(40_000));  // true, баланс -40000
+        System.out.println(credit.pay(20_000));  // false, превышен лимит 50000
+        System.out.println(credit.add(10_000));  // true, баланс -30000
+        System.out.println(credit.add(50_000));  // false, счёт не может уходить в плюс
+        System.out.println("Баланс кредитного счёта: " + credit.getBalance()); // -30000
 
-        // Задача 2: применение массива сделок
-        Deal[] deals = {
-                new Sale("Колбаса", 20_000),
-                new Sale("Хлеб", 5_000),
-                new Expenditure("Мука", 8_000)
-        };
-        int difference = company.applyDeals(deals);
-        System.out.println("Разница доходов и расходов: " + difference + " руб.");
+        // Переводы в обе стороны
+        System.out.println(simple.transfer(credit, 20_000)); // true
+        System.out.println(credit.transfer(simple, 90_000)); // false, превышен лимит
+        System.out.println("Баланс обычного счёта: " + simple.getBalance());  // 50000
+        System.out.println("Баланс кредитного счёта: " + credit.getBalance()); // -10000
     }
 }
