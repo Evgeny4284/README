@@ -1,91 +1,49 @@
-import 1java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Main {
 
     public static void main(String[] args) {
+        Map<Address, Integer> costPerAddress = new HashMap<>();
+        costPerAddress.put(new Address("Россия", "Москва"), 150);
+        costPerAddress.put(new Address("Россия", "Казань"), 200);
+        costPerAddress.put(new Address("Россия", "Новосибирск"), 300);
+        costPerAddress.put(new Address("США", "Нью-Йорк"), 500);
+        costPerAddress.put(new Address("Германия", "Берлин"), 400);
+
+        int totalCost = 0;
+        Set<String> uniqueCountries = new HashSet<>();
+
         try (Scanner scanner = new Scanner(System.in)) {
-            List<String> tasks = new ArrayList<>();
-
             while (true) {
-                System.out.println("Выберите операцию:");
-                System.out.println("0. Выход из программы");
-                System.out.println("1. Добавить дело");
-                System.out.println("2. Показать дела");
-                System.out.println("3. Удалить дело по номеру");
-                System.out.println("4. Удалить дело по названию");
-                System.out.println("5. Удалить дело по ключевому слову");
-                System.out.print("Ваш выбор: ");
-                String input = scanner.nextLine();
+                System.out.println("Заполнение нового заказа.");
+                System.out.print("Введите страну: ");
+                String country = scanner.nextLine();
+                if ("end".equals(country)) {
+                    break;
+                }
+                System.out.print("Введите город: ");
+                String city = scanner.nextLine();
+                System.out.print("Введите вес (кг): ");
+                int weight = Integer.parseInt(scanner.nextLine());
 
-                switch (input) {
-                    case "0":
-                        System.out.println("Программа завершена");
-                        return;
-                    case "1":
-                        System.out.print("Введите название задачи: ");
-                        String task = scanner.nextLine();
-                        tasks.add(task);
-                        System.out.println("Добавлено!");
-                        printTasks(tasks);
-                        break;
-                    case "2":
-                        printTasks(tasks);
-                        break;
-                    case "3":
-                        System.out.print("Введите номер для удаления: ");
-                        int number = Integer.parseInt(scanner.nextLine());
-                        if (number < 1 || number > tasks.size()) {
-                            System.out.println("Дела с таким номером нет!");
-                        } else {
-                            tasks.remove(number - 1);
-                            System.out.println("Удалено!");
-                        }
-                        printTasks(tasks);
-                        break;
-                    case "4":
-                        System.out.print("Введите задачу для удаления: ");
-                        String title = scanner.nextLine();
-                        if (tasks.remove(title)) {
-                            System.out.println("Удалено!");
-                        } else {
-                            System.out.println("Дела с таким названием нет!");
-                        }
-                        printTasks(tasks);
-                        break;
-                    case "5":
-                        System.out.print("Введите ключевое слово для удаления: ");
-                        String keyword = scanner.nextLine();
-                        // Сначала собираем задачи в отдельный список,
-                        // затем удаляем их разом — коллекция не меняется во время обхода
-                        List<String> toRemove = new ArrayList<>();
-                        for (String t : tasks) {
-                            if (t.contains(keyword)) {
-                                toRemove.add(t);
-                            }
-                        }
-                        if (toRemove.isEmpty()) {
-                            System.out.println("Дел с таким ключевым словом нет!");
-                        } else {
-                            tasks.removeAll(toRemove);
-                            System.out.println("Удалено задач: " + toRemove.size());
-                        }
-                        printTasks(tasks);
-                        break;
-                    default:
-                        System.out.println("Такой операции нет!");
-                        break;
+                Address address = new Address(country, city);
+                if (costPerAddress.containsKey(address)) {
+                    int cost = costPerAddress.get(address) * weight;
+                    totalCost += cost;
+                    uniqueCountries.add(country);
+                    System.out.println("Стоимость доставки составит: " + cost + " руб.");
+                    System.out.println("Общая стоимость всех доставок: " + totalCost + " руб.");
+                    System.out.println("Доставки оформлены в уникальных странах: " + uniqueCountries.size());
+                } else {
+                    System.out.println("Доставки по этому адресу нет");
                 }
                 System.out.println();
             }
         }
-    }
-
-    public static void printTasks(List<String> tasks) {
-        System.out.println("Ваш список дел:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + tasks.get(i));
-        }
+        System.out.println("Программа завершена");
     }
 }
